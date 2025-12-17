@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Proxy API requests to the backend server
+[[redirects]]
+  from = "/update-prompt"
+  to = "http://149.56.130.98:5014/update-prompt"
+  status = 200
+  force = true
+
+# Handle React Router (SPA catch-all)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
