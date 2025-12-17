@@ -9,6 +9,13 @@
   status = 200
   force = true
 
+# Proxy view-prompt API
+[[redirects]]
+  from = "/view-prompt"
+  to = "http://149.56.130.98:5014/view-prompt"
+  status = 200
+  force = true
+
 # Handle React Router (SPA catch-all)
 [[redirects]]
   from = "/*"

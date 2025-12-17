@@ -1,12 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Send, AlertCircle, Loader2 } from 'lucide-react';
 import { SuccessModal } from './SuccessModal';
 
 export function PromptForm() {
-  const [prompt, setPrompt] = useState('summarize the text with 2 lines');
+  const [prompt, setPrompt] = useState('');
+  const [fetchedPrompt, setFetchedPrompt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  const fetchPrompt = async () => {
+    try {
+      const res = await fetch('/view-prompt');
+      const data = await res.json();
+      if (res.ok && data.status === 'success' && data.current_prompt) {
+        setFetchedPrompt(data.current_prompt);
+      }
+    } catch (err) {
+      console.error('Failed to fetch prompt:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPrompt();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,6 +49,7 @@ export function PromptForm() {
       const data = await res.json();
 
       if (res.ok) {
+        await fetchPrompt();
         setPrompt('');
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 3000);
@@ -59,7 +77,7 @@ export function PromptForm() {
             id="prompt"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Enter your prompt here... (e.g., summarize the text with 2 lines)"
+            placeholder="Enter your new prompt here..."
             className="w-full px-5 py-4 bg-slate-950/50 border border-slate-700/50 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200 resize-none hover:border-slate-600/50"
             rows={5}
             disabled={isLoading}
@@ -84,6 +102,18 @@ export function PromptForm() {
           )}
         </button>
       </form>
+
+      {/* Display fetched prompt below ("call down") */}
+      {fetchedPrompt && (
+        <div className="mt-8 pt-6 border-t border-slate-700/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <p className="text-xs font-semibold text-blue-300 uppercase tracking-widest mb-3">
+            Current Live Prompt
+          </p>
+          <div className="bg-slate-950/30 p-4 rounded-xl border border-blue-500/10 text-slate-300 font-medium">
+            "{fetchedPrompt}"
+          </div>
+        </div>
+      )}
 
       {showSuccess && <SuccessModal />}
 

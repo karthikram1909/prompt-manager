@@ -27,6 +27,10 @@ export default defineConfig({
           });
         },
       },
+      '/view-prompt': {
+        target: 'http://149.56.130.98:5014',
+        changeOrigin: true,
+      },
     },
   },
 });
